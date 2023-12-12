@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Model Training Results</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            overflow: hidden;
+        }
+        .results {
+            margin-top: 20px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            background-color: #f9f9f9;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin-top: 20px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Model Training Results</h2>
+        <div class="results">
+            <h3>Model Details:</h3>
+            <p><strong>Model Type:</strong> {{ model_details.model_type }}</p>
+            <p><strong>Accuracy:</strong> {{ model_details.accuracy }}</p>
+            <a href="{{ url_for('download_model') }}" class="button">Download Model</a>
+        </div>
+    </div>
+</body>
+</html>
