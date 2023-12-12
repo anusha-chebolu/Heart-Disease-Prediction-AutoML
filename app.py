@@ -6,6 +6,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
+from sklearn.metrics import classification_report, confusion_matrix
 import tpot2
 from werkzeug.utils import secure_filename
 import os
@@ -100,9 +101,13 @@ def train_model():
         scorer = sklearn.metrics.get_scorer('accuracy')
         accuracy = scorer(tpot, X_test_transformed, y_test)
         model_type = str(tpot.fitted_pipeline_)
-
+        predictions = tpot.predict(X_test_transformed)
+        clf_report = classification_report(y_test, predictions,output_dict=True)
+        print(clf_report)
+        conf_matrix = confusion_matrix(y_test, predictions).tolist()
         # Save model details in session
-        session['model_details'] = {'accuracy': accuracy, 'model_type': model_type}
+        session['model_details'] = {'accuracy': accuracy, 'model_type': model_type, "confusion_matrix": conf_matrix}
+        session['model_details']['classification_report'] = clf_report
 
         # Save the trained model to a file
         model_path = os.path.join('tmp/', 'tpot_model.pkl')
