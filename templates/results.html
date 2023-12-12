@@ -31,6 +31,19 @@
         .button:hover {
             background-color: #45a049;
         }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
     </style>
 </head>
 <body>
@@ -40,6 +53,31 @@
             <h3>Model Details:</h3>
             <p><strong>Model Type:</strong> {{ model_details.model_type }}</p>
             <p><strong>Accuracy:</strong> {{ model_details.accuracy }}</p>
+            
+            <h4>Classification Report:</h4>
+            <table>
+                <tr>
+                    <th>Class</th>
+                    <th>Precision</th>
+                    <th>Recall</th>
+                    <th>F1-Score</th>
+                    <th>Support</th>
+                </tr>
+                {% for class, metrics in model_details.classification_report.items() %}
+                {% if class != 'accuracy' %}
+                <tr>
+                    <td>{{ class }}</td>
+                    <td>{{ metrics.precision|round(2) }}</td>
+                    <td>{{ metrics.recall|round(2) }}</td>
+                    <td>{{ metrics['f1-score']|round(2) }}</td>
+                    <td>{{ metrics.support }}</td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+            </table>
+
+            <p><strong>Confusion Matrix:</strong> {{ model_details.confusion_matrix }}</p>
+            
             <a href="{{ url_for('download_model') }}" class="button">Download Model</a>
         </div>
     </div>
