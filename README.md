@@ -46,3 +46,6 @@ To set up the project, follow these steps:
 - scikit-learn
 - TPOT
 - Werkzeug
+
+## Note: 
+When a file is uploaded and the feature columns along with the target column are specified, the model training process begins. This stage may appear to be unresponsive or 'stuck', but in reality, it's just that the model training requires a considerable amount of time to complete.
