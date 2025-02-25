@@ -1,143 +1,135 @@
-# Importing necessary libraries
-from flask import Flask, request, jsonify, send_from_directory, render_template, redirect, url_for, session, send_file
+from fastapi import FastAPI, File, UploadFile, Request, HTTPException, BackgroundTasks, Form
+from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
+from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.model_selection import train_test_split
+from fastapi.templating import Jinja2Templates
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
 import pandas as pd
 import numpy as np
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
-from sklearn.pipeline import Pipeline
-from sklearn.compose import ColumnTransformer
-from sklearn.metrics import classification_report, confusion_matrix
-import tpot2
-from werkzeug.utils import secure_filename
-import os
-import sklearn
 import pickle
+import tpot2
+import os
 
-# Initialize Flask app
-app = Flask(__name__,template_folder='templates')
-
-# Configuration for file upload
-UPLOAD_FOLDER = 'tmp/'
-ALLOWED_EXTENSIONS = {'csv'}
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
-# Secret key for Flask session
-app.secret_key = 'Anusha123'
-
-# Function to check if the uploaded file has an allowed extension
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+app = FastAPI()
+UPLOAD_FOLDER = "tmp/"
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+templates = Jinja2Templates(directory="templates")
 
 # Function for preprocessing the data
 def preprocess_data(X_train, X_test):
-    # Identify categorical columns
     categorical_cols = X_train.select_dtypes(include=['object', 'category']).columns
-
-    # Create pipelines for categorical and numerical feature processing
     categorical_pipe = Pipeline([('onehot', OneHotEncoder(handle_unknown='ignore'))])
     numeric_pipe = Pipeline([('scaler', StandardScaler())])
-
-    # Combine pipelines into a ColumnTransformer
     preprocessor = ColumnTransformer(
         transformers=[
             ('cat', categorical_pipe, categorical_cols),
             ('num', numeric_pipe, X_train.columns.difference(categorical_cols))
         ])
-
-    # Apply the preprocessing to the training and test data
     X_train_transformed = preprocessor.fit_transform(X_train)
     X_test_transformed = preprocessor.transform(X_test)
     return X_train_transformed, X_test_transformed
 
-# Route for the index page
-@app.route('/')
-def index():
-    return render_template('index.html')
+# Route to render the upload page
+@app.get("/")
+async def upload_page(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
 
-# Route for handling file upload
-@app.route('/upload', methods=['POST'])
-def upload_file():
-    if 'file' not in request.files:
-        return render_template('index.html', error="No file part")
-    file = request.files['file']
-    if file.filename == '':
-        return render_template('index.html', error="No selected file")
-    if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
-        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        file.save(filepath)
-        return render_template('index.html', filepath=filepath, filename=filename)
-    return render_template('index.html', error="Invalid file type")
+# File upload endpoint
+@app.post("/upload")
+async def upload_file(request: Request, file: UploadFile = File(...)):
+    if not file.filename.endswith(".csv"):
+        return templates.TemplateResponse("index.html", {"request": request, "error": "Invalid file format. Only CSV is allowed."})
+    
+    file_path = os.path.join(UPLOAD_FOLDER, file.filename)
+    with open(file_path, "wb") as buffer:
+        buffer.write(file.file.read())
+    dataset = pd.read_csv(file_path)
+    column_names = list(dataset.columns)
+    return templates.TemplateResponse("index.html", {"request": request, "filepath": file_path, "filename": file.filename, "columns": column_names})
 
-# Route for training the model
-@app.route('/train', methods=['POST'])
-def train_model():
+# API Endpoint to get column names from uploaded CSV
+@app.get("/get_columns")
+async def get_columns(file_path: str):
     try:
-        # Extracting file path and column details from form data
-        file_path = request.form['file_path']
-        feature_columns = request.form['feature_columns'].split(',')
-        target_column = request.form['target_column']
-
-        # Read the dataset from the uploaded file
         dataset = pd.read_csv(file_path)
-        if not all(column in dataset.columns for column in feature_columns):
-            return render_template('index.html', error="Column not found in dataset")
-
-        # Splitting dataset into features and target
-        features = dataset[feature_columns]
-        target = dataset[target_column]
-
-        # Splitting data into training and test sets
-        X_train, X_test, y_train, y_test = train_test_split(features, target, test_size=0.2, random_state=42)
-
-        # Preprocess the data
-        X_train_transformed, X_test_transformed = preprocess_data(X_train, X_test)
-
-        # Initialize and train TPOT estimator
-        tpot = tpot2.TPOTEstimator(population_size=50, generations=5, scorers=['accuracy'], verbose=1, n_jobs=32, scorers_weights=[1], classification=True, early_stop=5)
-        tpot.fit(X_train_transformed, y_train)
-
-        # Evaluate model accuracy
-        scorer = sklearn.metrics.get_scorer('accuracy')
-        accuracy = scorer(tpot, X_test_transformed, y_test)
-        model_type = str(tpot.fitted_pipeline_)
-        predictions = tpot.predict(X_test_transformed)
-        clf_report = classification_report(y_test, predictions,output_dict=True)
-        print(clf_report)
-        conf_matrix = confusion_matrix(y_test, predictions).tolist()
-        # Save model details in session
-        session['model_details'] = {'accuracy': accuracy, 'model_type': model_type, "confusion_matrix": conf_matrix}
-        session['model_details']['classification_report'] = clf_report
-
-        # Save the trained model to a file
-        model_path = os.path.join('tmp/', 'tpot_model.pkl')
-        with open(model_path, 'wb') as f:
-            pickle.dump(tpot.fitted_pipeline_, f)
-        session['model_path'] = model_path
-
-        # Redirect to the results page
-        return redirect(url_for('display_results'))
+        return {"columns": list(dataset.columns)}
     except Exception as e:
-        # Handle exceptions and return error message
-        return render_template('index.html', error=str(e))
+        raise HTTPException(status_code=400, detail=str(e))
 
-# Route to display the model results
-@app.route('/results', methods=['GET'])
-def display_results():
-    # Retrieve model details from session
-    model_details = session.get('model_details', {})
-    return render_template('results.html', model_details=model_details)
+# Asynchronous training function
+def train_model_task(file_path, feature_columns, target_column):
+    dataset = pd.read_csv(file_path)
+    feature_columns = feature_columns.split(',')
+    
+    if target_column not in dataset.columns or any(col not in dataset.columns for col in feature_columns):
+        raise ValueError("One or more selected columns are not in the dataset")
 
-# Route to download the trained model
-@app.route('/download_model', methods=['GET'])
+    features = dataset[feature_columns]
+    target = dataset[target_column]
+    X_train, X_test, y_train, y_test = train_test_split(features, target, test_size=0.2, random_state=42)
+    X_train_transformed, X_test_transformed = preprocess_data(X_train, X_test)
+
+    # Initialize and train TPOT estimator
+    tpot = tpot2.TPOTEstimator(population_size=50, generations=5, scorers=['accuracy'], verbose=1, n_jobs=32, scorers_weights=[1], classification=True, early_stop=5)
+    tpot.fit(X_train_transformed, y_train)
+    predictions = tpot.predict(X_test_transformed)
+
+    # Use sklearn's accuracy_score
+    accuracy = accuracy_score(y_test, predictions)
+    model_type = str(tpot.fitted_pipeline_)
+    clf_report = classification_report(y_test, predictions, output_dict=True)
+    conf_matrix = confusion_matrix(y_test, predictions).tolist()
+
+    # Save the trained model
+    model_path = os.path.join(UPLOAD_FOLDER, 'tpot_model.pkl')
+    with open(model_path, 'wb') as f:
+        pickle.dump(tpot.fitted_pipeline_, f)
+    
+    # Save model details for UI display
+    results_path = os.path.join(UPLOAD_FOLDER, 'model_results.pkl')
+    with open(results_path, 'wb') as f:
+        pickle.dump({
+            "accuracy": accuracy,
+            "classification_report": clf_report,
+            "confusion_matrix": conf_matrix,
+            "model_type": model_type
+        }, f)
+
+# API Endpoint: Train the Model Asynchronously
+@app.post("/train")
+async def train_model(
+    request: Request,
+    file_path: str = Form(...),
+    feature_columns: str = Form(...),
+    target_column: str = Form(...),
+    background_tasks: BackgroundTasks = BackgroundTasks()
+):
+    background_tasks.add_task(train_model_task, file_path, feature_columns, target_column)
+    return RedirectResponse(url="/results", status_code=303)
+
+# API Endpoint: Display Model Results
+@app.get("/results", response_class=HTMLResponse)
+async def display_results(request: Request):
+    results_path = os.path.join(UPLOAD_FOLDER, 'model_results.pkl')
+    if not os.path.exists(results_path):
+        return templates.TemplateResponse("results.html", {"request": request, "error": "Model results not found."})
+
+    with open(results_path, 'rb') as f:
+        model_results = pickle.load(f)
+
+    return templates.TemplateResponse("results.html", {"request": request, "model_details": model_results})
+
+# API Endpoint: Download Trained Model
+@app.get("/download_model")
 def download_model():
-    # Retrieve model path from session and send file if exists
-    model_path = session.get('model_path', '')
-    if model_path and os.path.exists(model_path):
-        return send_file(model_path, as_attachment=True)
+    model_path = os.path.join(UPLOAD_FOLDER, 'tpot_model.pkl')
+    if os.path.exists(model_path):
+        return FileResponse(model_path, filename="tpot_model.pkl", media_type="application/octet-stream")
     else:
-        return render_template('index.html', error="Model file not found.")
+        raise HTTPException(status_code=404, detail="Model file not found.")
 
-# Run the Flask application
-if __name__ == '__main__':
-    app.run(debug=True)
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
