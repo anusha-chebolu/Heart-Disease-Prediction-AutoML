@@ -1,0 +1,14 @@
+aliases: []
+creation_timestamp: 1740458582276
+current_stage: None
+description: null
+last_updated_timestamp: 1740458582276
+name: HeartDiseasePrediction
+run_id: 94b697e70518437cb59023070f417588
+run_link: null
+source: file:///Users/anushachebolu/Documents/Heart-Disease-Prediction-AutoML/mlruns/457549725131934377/94b697e70518437cb59023070f417588/artifacts/model
+status: READY
+status_message: null
+storage_location: file:///Users/anushachebolu/Documents/Heart-Disease-Prediction-AutoML/mlruns/457549725131934377/94b697e70518437cb59023070f417588/artifacts/model
+user_id: null
+version: 3

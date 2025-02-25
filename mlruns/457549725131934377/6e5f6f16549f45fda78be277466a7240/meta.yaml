@@ -1,0 +1,15 @@
+artifact_uri: file:///Users/anushachebolu/Documents/Heart-Disease-Prediction-AutoML/mlruns/457549725131934377/6e5f6f16549f45fda78be277466a7240/artifacts
+end_time: 1740458241183
+entry_point_name: ''
+experiment_id: '457549725131934377'
+lifecycle_stage: active
+run_id: 6e5f6f16549f45fda78be277466a7240
+run_name: nebulous-hound-914
+run_uuid: 6e5f6f16549f45fda78be277466a7240
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1740458233067
+status: 4
+tags: []
+user_id: anushachebolu

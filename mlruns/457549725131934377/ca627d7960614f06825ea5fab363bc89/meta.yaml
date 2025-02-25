@@ -1,0 +1,15 @@
+artifact_uri: file:///Users/anushachebolu/Documents/Heart-Disease-Prediction-AutoML/mlruns/457549725131934377/ca627d7960614f06825ea5fab363bc89/artifacts
+end_time: 1740458385826
+entry_point_name: ''
+experiment_id: '457549725131934377'
+lifecycle_stage: active
+run_id: ca627d7960614f06825ea5fab363bc89
+run_name: trusting-perch-842
+run_uuid: ca627d7960614f06825ea5fab363bc89
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1740458322032
+status: 4
+tags: []
+user_id: anushachebolu

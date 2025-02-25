@@ -1,0 +1,15 @@
+artifact_uri: file:///Users/anushachebolu/Documents/Heart-Disease-Prediction-AutoML/mlruns/457549725131934377/94b697e70518437cb59023070f417588/artifacts
+end_time: 1740458582296
+entry_point_name: ''
+experiment_id: '457549725131934377'
+lifecycle_stage: active
+run_id: 94b697e70518437cb59023070f417588
+run_name: redolent-doe-308
+run_uuid: 94b697e70518437cb59023070f417588
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1740458478095
+status: 3
+tags: []
+user_id: anushachebolu
