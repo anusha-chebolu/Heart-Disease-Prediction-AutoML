@@ -1,0 +1,15 @@
+artifact_uri: file:///Users/anushachebolu/Documents/Heart-Disease-Prediction-AutoML/mlruns/457549725131934377/e06bea0be459492d850c76789227158b/artifacts
+end_time: 1740450758564
+entry_point_name: ''
+experiment_id: '457549725131934377'
+lifecycle_stage: active
+run_id: e06bea0be459492d850c76789227158b
+run_name: indecisive-wolf-645
+run_uuid: e06bea0be459492d850c76789227158b
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1740450683638
+status: 3
+tags: []
+user_id: anushachebolu

@@ -7,3 +7,4 @@ tpot2
 pydantic
 jinja2
 python-multipart
+mlflow

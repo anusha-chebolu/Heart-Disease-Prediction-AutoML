@@ -1,0 +1,15 @@
+artifact_uri: file:///Users/anushachebolu/Documents/Heart-Disease-Prediction-AutoML/mlruns/457549725131934377/c9fce50496f04f86a168cea0a97015af/artifacts
+end_time: 1740449704082
+entry_point_name: ''
+experiment_id: '457549725131934377'
+lifecycle_stage: active
+run_id: c9fce50496f04f86a168cea0a97015af
+run_name: smiling-asp-350
+run_uuid: c9fce50496f04f86a168cea0a97015af
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1740449610534
+status: 3
+tags: []
+user_id: anushachebolu

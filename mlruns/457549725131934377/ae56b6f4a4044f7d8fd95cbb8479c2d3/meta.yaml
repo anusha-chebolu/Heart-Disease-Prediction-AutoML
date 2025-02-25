@@ -1,0 +1,15 @@
+artifact_uri: file:///Users/anushachebolu/Documents/Heart-Disease-Prediction-AutoML/mlruns/457549725131934377/ae56b6f4a4044f7d8fd95cbb8479c2d3/artifacts
+end_time: 1740449189339
+entry_point_name: ''
+experiment_id: '457549725131934377'
+lifecycle_stage: active
+run_id: ae56b6f4a4044f7d8fd95cbb8479c2d3
+run_name: bustling-quail-974
+run_uuid: ae56b6f4a4044f7d8fd95cbb8479c2d3
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1740449107108
+status: 3
+tags: []
+user_id: anushachebolu

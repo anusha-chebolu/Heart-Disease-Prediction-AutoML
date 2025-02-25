@@ -1,0 +1,13 @@
+[2025-02-24 22:42:39 -0500] [11795] [INFO] Starting gunicorn 23.0.0
+[2025-02-24 22:42:39 -0500] [11795] [INFO] Listening at: http://0.0.0.0:5001 (11795)
+[2025-02-24 22:42:39 -0500] [11795] [INFO] Using worker: sync
+[2025-02-24 22:42:39 -0500] [11796] [INFO] Booting worker with pid: 11796
+[2025-02-24 22:42:39 -0500] [11797] [INFO] Booting worker with pid: 11797
+[2025-02-24 22:42:39 -0500] [11798] [INFO] Booting worker with pid: 11798
+[2025-02-24 22:42:39 -0500] [11799] [INFO] Booting worker with pid: 11799
+[2025-02-24 22:45:12 -0500] [11795] [INFO] Handling signal: term
+[2025-02-24 22:45:12 -0500] [11796] [INFO] Worker exiting (pid: 11796)
+[2025-02-24 22:45:12 -0500] [11799] [INFO] Worker exiting (pid: 11799)
+[2025-02-24 22:45:12 -0500] [11797] [INFO] Worker exiting (pid: 11797)
+[2025-02-24 22:45:12 -0500] [11798] [INFO] Worker exiting (pid: 11798)
+[2025-02-24 22:45:13 -0500] [11795] [INFO] Shutting down: Master
